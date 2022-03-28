@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import mvc.app.Config;
+import mvc.controller.AddFileInput;
 import mvc.model.Cruncher;
 import mvc.model.Disk;
 import mvc.model.FileInput;
@@ -28,10 +29,12 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class MainView {
+	private static MainView instance;
+
 	private Stage stage;
 	private ComboBox<Disk> disks;
 	private HBox left;
-	private VBox fileInput, cruncher;
+	private VBox vBoxFileInput, vBcruncher;
 	private Pane center, right;
 	private ListView<String> results;
 	private Button addFileInput, singleResult, sumResult;
@@ -40,6 +43,16 @@ public class MainView {
 	private ArrayList<Cruncher> availableCrunchers;
 
 	private Button addCruncher;
+
+	private MainView() {
+
+	}
+
+	public static MainView getInstance() {
+		if (instance == null)
+			instance = new MainView();
+		return instance;
+	}
 
 	public void initMainView(BorderPane borderPane, Stage stage) {
 
@@ -62,23 +75,23 @@ public class MainView {
 	}
 
 	private void initFileInput() {
-		fileInput = new VBox();
+		vBoxFileInput = new VBox();
 
-		fileInput.getChildren().add(new Text("File inputs:"));
-		VBox.setMargin(fileInput.getChildren().get(0), new Insets(0, 0, 10, 0));
+		vBoxFileInput.getChildren().add(new Text("File inputs:"));
+		VBox.setMargin(vBoxFileInput.getChildren().get(0), new Insets(0, 0, 10, 0));
 
 		disks = new ComboBox<Disk>();
 		disks.getSelectionModel().selectedItemProperty().addListener(e -> updateEnableAddFileInput());
 		disks.setMinWidth(120);
 		disks.setMaxWidth(120);
-		fileInput.getChildren().add(disks);
+		vBoxFileInput.getChildren().add(disks);
 
 		addFileInput = new Button("Add FileInput");
-		addFileInput.setOnAction(e -> addFileInput(new FileInput(disks.getSelectionModel().getSelectedItem())));
+		addFileInput.setOnAction(new AddFileInput(this));
 		VBox.setMargin(addFileInput, new Insets(5, 0, 10, 0));
 		addFileInput.setMinWidth(120);
 		addFileInput.setMaxWidth(120);
-		fileInput.getChildren().add(addFileInput);
+		vBoxFileInput.getChildren().add(addFileInput);
 
 		int width = 210;
 
@@ -86,14 +99,14 @@ public class MainView {
 		divider.getStyleClass().add("divider");
 		divider.setMinWidth(width);
 		divider.setMaxWidth(width);
-		fileInput.getChildren().add(divider);
+		vBoxFileInput.getChildren().add(divider);
 		VBox.setMargin(divider, new Insets(0, 0, 15, 0));
 
 		Insets insets = new Insets(10);
-		ScrollPane scrollPane = new ScrollPane(fileInput);
+		ScrollPane scrollPane = new ScrollPane(vBoxFileInput);
 		scrollPane.setMinWidth(width + 35);
-		fileInput.setPadding(insets);
-		fileInput.getChildren().add(scrollPane);
+		vBoxFileInput.setPadding(insets);
+		vBoxFileInput.getChildren().add(scrollPane);
 
 		left.getChildren().add(scrollPane);
 
@@ -130,23 +143,23 @@ public class MainView {
 	}
 
 	private void initCruncher() {
-		cruncher = new VBox();
+		vBcruncher = new VBox();
 
 		Text text = new Text("Crunchers");
-		cruncher.getChildren().add(text);
+		vBcruncher.getChildren().add(text);
 		VBox.setMargin(text, new Insets(0, 0, 5, 0));
 
 		addCruncher = new Button("Add cruncher");
 		addCruncher.setOnAction(e -> addCruncher());
-		cruncher.getChildren().add(addCruncher);
+		vBcruncher.getChildren().add(addCruncher);
 		VBox.setMargin(addCruncher, new Insets(0, 0, 15, 0));
 
 		int width = 110;
 
 		Insets insets = new Insets(10);
-		ScrollPane scrollPane = new ScrollPane(cruncher);
+		ScrollPane scrollPane = new ScrollPane(vBcruncher);
 		scrollPane.setMinWidth(width + 35);
-		cruncher.setPadding(insets);
+		vBcruncher.setPadding(insets);
 		left.getChildren().add(scrollPane);
 	}
 
@@ -229,20 +242,8 @@ public class MainView {
 		
 	}
 
-	public void addFileInput(FileInput fileInput) {
-		FileInputView fileInputView = new FileInputView(fileInput, this);
-		this.fileInput.getChildren().add(fileInputView.getFileInputView());
-		VBox.setMargin(fileInputView.getFileInputView(), new Insets(0, 0, 30, 0));
-		fileInputView.getFileInputView().getStyleClass().add("file-input");
-		fileInputViews.add(fileInputView);
-		if (availableCrunchers != null) {
-			fileInputView.updateAvailableCrunchers(availableCrunchers);
-		}
-		updateEnableAddFileInput();
-	}
-
 	public void removeFileInputView(FileInputView fileInputView) {
-		fileInput.getChildren().remove(fileInputView.getFileInputView());
+		vBoxFileInput.getChildren().remove(fileInputView.getFileInputView());
 		fileInputViews.remove(fileInputView);
 		updateEnableAddFileInput();
 	}
@@ -279,7 +280,7 @@ public class MainView {
 				}
 				Cruncher cruncher = new Cruncher(arity);
 				CruncherView cruncherView = new CruncherView(this, cruncher);
-				this.cruncher.getChildren().add(cruncherView.getCruncherView());
+				this.vBcruncher.getChildren().add(cruncherView.getCruncherView());
 				availableCrunchers.add(cruncher);
 				updateCrunchers(availableCrunchers);
 			} catch (NumberFormatException e) {
@@ -305,10 +306,41 @@ public class MainView {
 		}
 		availableCrunchers.remove(cruncherView.getCruncher());
 		updateCrunchers(availableCrunchers);
-		cruncher.getChildren().remove(cruncherView.getCruncherView());
+		vBcruncher.getChildren().remove(cruncherView.getCruncherView());
 	}
 
 	public Pane getRight() {
 		return right;
 	}
+
+	public ComboBox<Disk> getComboBoxDisks() {
+		return disks;
+	}
+
+	public VBox getVBoxFileInput() {
+		return vBoxFileInput;
+	}
+
+	public ArrayList<FileInputView> getFileInputViews() {
+		return fileInputViews;
+	}
+
+	public ArrayList<Cruncher> getAvailableCrunchers() {
+		return availableCrunchers;
+	}
+
+
+	/*
+	public void addFileInput(FileInput fileInput) {
+		FileInputView fileInputView = new FileInputView(fileInput, this);
+		this.vBoxFileInput.getChildren().add(fileInputView.getFileInputView());
+		VBox.setMargin(fileInputView.getFileInputView(), new Insets(0, 0, 30, 0));
+		fileInputView.getFileInputView().getStyleClass().add("file-input");
+		fileInputViews.add(fileInputView);
+		if (availableCrunchers != null) {
+			fileInputView.updateAvailableCrunchers(availableCrunchers);
+		}
+		updateEnableAddFileInput();
+	}
+	*/
 }

@@ -12,6 +12,7 @@ import java.util.concurrent.ExecutorService;
 public class FileInputComp implements Runnable {
 
     private ExecutorService threadPool;
+    private final String disc;
 
     private List<CounterCruncherComp> crunchers;
     private List<File> directories;
@@ -21,7 +22,8 @@ public class FileInputComp implements Runnable {
     private volatile boolean running = false;
     private volatile boolean quit = false;
 
-    public FileInputComp(ExecutorService threadPool) {
+    public FileInputComp(ExecutorService threadPool, String disc) {
+        this.disc = disc;
         directories = new CopyOnWriteArrayList<>();
         this.threadPool = threadPool;
         lastModify = new ConcurrentHashMap<>();
@@ -52,20 +54,40 @@ public class FileInputComp implements Runnable {
                 if (f.isDirectory())
                     searchFiles(f);
                 else if (getFileExtension(f).equals(".txt")) {
-
+                    isReadable(f);
                 }
             }
+        }
+    }
+
+    private void isReadable(File file) {
+        Long lastModified = lastModify.get(file);
+        if (lastModified == null || !lastModified.equals(file.lastModified())) {
+            lastModify.put(file, file.lastModified());
+            threadPool.execute(new FileReader(file, disc, crunchers));
         }
     }
 
     private String getFileExtension(File directory) {
         if (directory == null || directory.getName() == null)
             return "";
-        String name = directory.getName().toLowerCase(Locale.ROOT);
+        String name = directory.getName().toLowerCase();
         if (directory.getName().contains("."))
             return name.substring(name.lastIndexOf("."));
 
         return "";
+    }
+
+
+    private void sleep(int time) {
+        try {
+            if (time == 0)
+                wait();
+            else
+                wait(time);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void addCruncher(CounterCruncherComp cruncher) {
@@ -82,19 +104,6 @@ public class FileInputComp implements Runnable {
 
     void removeDirectory(File directory) {
 
-    }
-
-    private void sleep(int time) {
-        try {
-
-            if (time == 0)
-                wait();
-            else
-                wait(time);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-
-        }
     }
 
 }

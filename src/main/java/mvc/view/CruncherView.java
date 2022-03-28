@@ -34,7 +34,7 @@ public class CruncherView {
 		main.getChildren().add(remove);
 		VBox.setMargin(remove, new Insets(0, 0, 5, 0));
 
-		status = new Text("");
+		status = new Text("text");
 		main.getChildren().add(status);
 
 		VBox.setMargin(main, new Insets(0, 0, 15, 0));
