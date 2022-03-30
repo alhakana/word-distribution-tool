@@ -29,7 +29,9 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class MainView {
+	/*
 	private static MainView instance;
+	*/
 
 	private Stage stage;
 	private ComboBox<Disk> disks;
@@ -44,6 +46,7 @@ public class MainView {
 
 	private Button addCruncher;
 
+	/*
 	private MainView() {
 
 	}
@@ -53,6 +56,7 @@ public class MainView {
 			instance = new MainView();
 		return instance;
 	}
+ 	*/
 
 	public void initMainView(BorderPane borderPane, Stage stage) {
 

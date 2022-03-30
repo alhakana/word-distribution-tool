@@ -1,11 +1,11 @@
 package components;
 
 import javafx.application.Platform;
+import javafx.scene.text.Text;
 
 public class Utils {
 
-    public static void notifyPlatform(Object o, String text) {
-//        if (o instanceof )
-//        Platform.runLater(() -> statusLabel.setText(text));
+    public static void notifyPlatform(Text text, String string) {
+        Platform.runLater(() -> text.setText(string));
     }
 }

@@ -16,7 +16,7 @@ public class App extends Application {
     public void start(Stage stage) {
     	BorderPane root = new BorderPane();
 		Scene scene = new Scene(root, 1300, 800);
-		MainView mainView = MainView.getInstance();
+		MainView mainView = new MainView();
 		mainView.initMainView(root, stage);
 		stage.setScene(scene);
 		stage.show();

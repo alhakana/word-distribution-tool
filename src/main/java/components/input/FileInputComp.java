@@ -1,8 +1,8 @@
 package components.input;
 
 import components.cruncher.CounterCruncherComp;
+import javafx.scene.text.Text;
 import mvc.app.Config;
-
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,7 +22,7 @@ public class FileInputComp implements Runnable {
     private volatile boolean running = false;
     private volatile boolean quit = false;
 
-    public FileInputComp(ExecutorService threadPool, String disc) {
+    public FileInputComp(ExecutorService threadPool, String disc, Text text) {
         this.disc = disc;
         directories = new CopyOnWriteArrayList<>();
         this.threadPool = threadPool;
@@ -78,6 +78,13 @@ public class FileInputComp implements Runnable {
         return "";
     }
 
+    public synchronized void start() {
+
+    }
+
+    public synchronized void pause() {
+
+    }
 
     private void sleep(int time) {
         try {

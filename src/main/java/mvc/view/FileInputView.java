@@ -3,6 +3,7 @@ package mvc.view;
 import java.io.File;
 import java.util.ArrayList;
 
+import mvc.controller.StartFileInput;
 import mvc.model.Cruncher;
 import mvc.model.Directory;
 import mvc.model.FileInput;
@@ -38,7 +39,7 @@ public class FileInputView {
 		this.fileInput = fileInput;
 
 		main = new VBox();
-		main.getChildren().add(new Text("File input " + fileInput.toString() + ": " + fileInput.getDisk().toString()));
+		main.getChildren().add(new Text(fileInput.toString() + ": " + fileInput.getDisk().toString()));
 		VBox.setMargin(main.getChildren().get(0), new Insets(0, 0, 10, 0));
 		main.getChildren().add(new Text("Crunchers:"));
 
@@ -107,7 +108,7 @@ public class FileInputView {
 		main.getChildren().add(hBox);
 
 		start = new Button("Start");
-		start.setOnAction(e -> start());
+		start.setOnAction(new StartFileInput(fileInput.getName()));
 		start.setMinWidth(width);
 		start.setMaxWidth(width);
 		VBox.setMargin(start, new Insets(15, 0, 0, 0));
@@ -200,17 +201,19 @@ public class FileInputView {
 	private void removeDirectory(Directory directory) {
 		directories.getItems().remove(directory);
 	}
-
+	/*
 	private void start() {
 		
 	}
+
+	 */
 
 	private void removeDiskInput() {
 		mainView.removeFileInputView(this);
 	}
 	
-	public void setStatus(String status) {
-		this.status.setText(status);
+	public void setStatus(Text text) {
+		this.status = text;
 	}
 	
 	public FileInput getFileInput() {
