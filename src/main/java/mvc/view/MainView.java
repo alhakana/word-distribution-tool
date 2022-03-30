@@ -3,12 +3,10 @@ package mvc.view;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Optional;
-
 import mvc.app.Config;
 import mvc.controller.AddFileInput;
 import mvc.model.Cruncher;
 import mvc.model.Disk;
-import mvc.model.FileInput;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.chart.LineChart;
@@ -29,52 +27,32 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class MainView {
-	/*
-	private static MainView instance;
-	*/
 
 	private Stage stage;
 	private ComboBox<Disk> disks;
 	private HBox left;
-	private VBox vBoxFileInput, vBcruncher;
+	private VBox vBoxFileInput, vBoxCruncher;
 	private Pane center, right;
 	private ListView<String> results;
 	private Button addFileInput, singleResult, sumResult;
 	private ArrayList<FileInputView> fileInputViews;
 	private LineChart<Number, Number> lineChart;
 	private ArrayList<Cruncher> availableCrunchers;
-
 	private Button addCruncher;
 
-	/*
-	private MainView() {
-
-	}
-
-	public static MainView getInstance() {
-		if (instance == null)
-			instance = new MainView();
-		return instance;
-	}
- 	*/
-
 	public void initMainView(BorderPane borderPane, Stage stage) {
-
 		this.stage = stage;
 
-		fileInputViews = new ArrayList<FileInputView>();
-		availableCrunchers = new ArrayList<Cruncher>();
+		fileInputViews = new ArrayList<>();
+		availableCrunchers = new ArrayList<>();
 
 		left = new HBox();
-
 		borderPane.setLeft(left);
 
 		initFileInput();
-
 		initCruncher();
 
 		initCenter(borderPane);
-
 		initRight(borderPane);
 	}
 
@@ -84,7 +62,7 @@ public class MainView {
 		vBoxFileInput.getChildren().add(new Text("File inputs:"));
 		VBox.setMargin(vBoxFileInput.getChildren().get(0), new Insets(0, 0, 10, 0));
 
-		disks = new ComboBox<Disk>();
+		disks = new ComboBox<>();
 		disks.getSelectionModel().selectedItemProperty().addListener(e -> updateEnableAddFileInput());
 		disks.setMinWidth(120);
 		disks.setMaxWidth(120);
@@ -128,18 +106,14 @@ public class MainView {
 				disks.getSelectionModel().select(0);
 			}
 		} catch (Exception e) {
-			Platform.runLater(new Runnable() {
-				
-				@Override
-				public void run() {
-					Alert alert = new Alert(AlertType.ERROR);
-					alert.setTitle("Closing");
-					alert.setHeaderText("Bad config disks");
-					alert.setContentText(null);
+			Platform.runLater(() -> {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Closing");
+				alert.setHeaderText("Bad config disks");
+				alert.setContentText(null);
 
-					alert.showAndWait();
-					System.exit(0);
-				}
+				alert.showAndWait();
+				System.exit(0);
 			});
 		}
 
@@ -147,23 +121,23 @@ public class MainView {
 	}
 
 	private void initCruncher() {
-		vBcruncher = new VBox();
+		vBoxCruncher = new VBox();
 
 		Text text = new Text("Crunchers");
-		vBcruncher.getChildren().add(text);
+		vBoxCruncher.getChildren().add(text);
 		VBox.setMargin(text, new Insets(0, 0, 5, 0));
 
 		addCruncher = new Button("Add cruncher");
 		addCruncher.setOnAction(e -> addCruncher());
-		vBcruncher.getChildren().add(addCruncher);
+		vBoxCruncher.getChildren().add(addCruncher);
 		VBox.setMargin(addCruncher, new Insets(0, 0, 15, 0));
 
 		int width = 110;
 
 		Insets insets = new Insets(10);
-		ScrollPane scrollPane = new ScrollPane(vBcruncher);
+		ScrollPane scrollPane = new ScrollPane(vBoxCruncher);
 		scrollPane.setMinWidth(width + 35);
-		vBcruncher.setPadding(insets);
+		vBoxCruncher.setPadding(insets);
 		left.getChildren().add(scrollPane);
 	}
 
@@ -174,7 +148,7 @@ public class MainView {
 		final NumberAxis yAxis = new NumberAxis();
 		xAxis.setLabel("Bag of words");
 		yAxis.setLabel("Frequency");
-		lineChart = new LineChart<Number, Number>(xAxis, yAxis);
+		lineChart = new LineChart<>(xAxis, yAxis);
 		lineChart.setMinWidth(700);
 		lineChart.setMinHeight(600);
 		center.getChildren().add(lineChart);
@@ -187,7 +161,7 @@ public class MainView {
 		right.setPadding(new Insets(10));
 		right.setMaxWidth(200);
 
-		results = new ListView<String>();
+		results = new ListView<>();
 		right.getChildren().add(results);
 		VBox.setMargin(results, new Insets(0, 0, 10, 0));
 		results.getSelectionModel().selectedItemProperty().addListener(e -> updateResultButtons());
@@ -284,7 +258,7 @@ public class MainView {
 				}
 				Cruncher cruncher = new Cruncher(arity);
 				CruncherView cruncherView = new CruncherView(this, cruncher);
-				this.vBcruncher.getChildren().add(cruncherView.getCruncherView());
+				this.vBoxCruncher.getChildren().add(cruncherView.getCruncherView());
 				availableCrunchers.add(cruncher);
 				updateCrunchers(availableCrunchers);
 			} catch (NumberFormatException e) {
@@ -310,7 +284,7 @@ public class MainView {
 		}
 		availableCrunchers.remove(cruncherView.getCruncher());
 		updateCrunchers(availableCrunchers);
-		vBcruncher.getChildren().remove(cruncherView.getCruncherView());
+		vBoxCruncher.getChildren().remove(cruncherView.getCruncherView());
 	}
 
 	public Pane getRight() {
@@ -325,6 +299,9 @@ public class MainView {
 		return vBoxFileInput;
 	}
 
+	public VBox getvBoxCruncher() {
+		return vBoxCruncher;
+	}
 	public ArrayList<FileInputView> getFileInputViews() {
 		return fileInputViews;
 	}
@@ -335,6 +312,19 @@ public class MainView {
 
 
 	/*
+		private static MainView instance;
+
+
+	private MainView() {
+
+	}
+
+	public static MainView getInstance() {
+		if (instance == null)
+			instance = new MainView();
+		return instance;
+	}
+
 	public void addFileInput(FileInput fileInput) {
 		FileInputView fileInputView = new FileInputView(fileInput, this);
 		this.vBoxFileInput.getChildren().add(fileInputView.getFileInputView());

@@ -3,6 +3,7 @@ package mvc.view;
 import java.io.File;
 import java.util.ArrayList;
 
+import mvc.controller.LinkCruncher;
 import mvc.controller.StartFileInput;
 import mvc.model.Cruncher;
 import mvc.model.Directory;
@@ -19,6 +20,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 
+/** @noinspection IntegerDivisionInFloatingPointContext*/
 public class FileInputView {
 	MainView mainView;
 	Pane main;
@@ -26,7 +28,7 @@ public class FileInputView {
 	ListView<Cruncher> linkedCrunchers;
 	ListView<Directory> directories;
 	ComboBox<Cruncher> availableCrunchers;
-	Button linkCrucher;
+	Button linkCruncher;
 	Button unlinkCruncher;
 	Button addDirectory;
 	Button removeDirectory;
@@ -45,7 +47,7 @@ public class FileInputView {
 
 		int width = 210;
 
-		linkedCrunchers = new ListView<Cruncher>();
+		linkedCrunchers = new ListView<>();
 		linkedCrunchers.setMinWidth(width);
 		linkedCrunchers.setMaxWidth(width);
 		linkedCrunchers.setMinHeight(150);
@@ -53,19 +55,19 @@ public class FileInputView {
 		linkedCrunchers.getSelectionModel().selectedItemProperty().addListener(e -> updateUnlinkCruncherButtonEnabled());
 		main.getChildren().add(linkedCrunchers);
 
-		availableCrunchers = new ComboBox<Cruncher>();
+		availableCrunchers = new ComboBox<>();
 		availableCrunchers.setMinWidth(width / 2 - 10);
 		availableCrunchers.setMaxWidth(width / 2 - 10);
 		availableCrunchers.getSelectionModel().selectedItemProperty().addListener(e -> updateLinkCruncherButtonEnabled());
 
-		linkCrucher = new Button("Link cruncher");
-		linkCrucher.setOnAction(e -> linkCruncher(availableCrunchers.getSelectionModel().getSelectedItem()));
-		linkCrucher.setMinWidth(width / 2 - 10);
-		linkCrucher.setMaxWidth(width / 2 - 10);
-		linkCrucher.setDisable(true);
+		linkCruncher = new Button("Link cruncher");
+		linkCruncher.setOnAction(new LinkCruncher(this));
+		linkCruncher.setMinWidth(width / 2 - 10);
+		linkCruncher.setMaxWidth(width / 2 - 10);
+		linkCruncher.setDisable(true);
 
 		HBox hBox = new HBox();
-		hBox.getChildren().addAll(availableCrunchers, linkCrucher);
+		hBox.getChildren().addAll(availableCrunchers, linkCruncher);
 		HBox.setMargin(availableCrunchers, new Insets(0, 20, 0, 0));
 		VBox.setMargin(hBox, new Insets(5, 0, 0, 0));
 		main.getChildren().add(hBox);
@@ -82,7 +84,7 @@ public class FileInputView {
 		main.getChildren().add(dirTitle);
 		VBox.setMargin(dirTitle, new Insets(10, 0, 0, 0));
 
-		directories = new ListView<Directory>();
+		directories = new ListView<>();
 		directories.setMinWidth(width);
 		directories.setMaxWidth(width);
 		directories.setMinHeight(150);
@@ -134,18 +136,18 @@ public class FileInputView {
 		return main;
 	}
 	
-	private void updateLinkCruncherButtonEnabled() {
+	public void updateLinkCruncherButtonEnabled() {
 		Cruncher cruncher =  availableCrunchers.getSelectionModel().getSelectedItem();
 		if(cruncher != null) {
 			for(Cruncher linkedCruncher: linkedCrunchers.getItems()) {
 				if(cruncher == linkedCruncher) {
-					linkCrucher.setDisable(true);
+					linkCruncher.setDisable(true);
 					return;
 				}
 			}
-			linkCrucher.setDisable(false);
+			linkCruncher.setDisable(false);
 		} else {
-			linkCrucher.setDisable(true);
+			linkCruncher.setDisable(true);
 		}
 	}
 	
@@ -163,10 +165,7 @@ public class FileInputView {
 		availableCrunchers.getSelectionModel().select(0);
 	}
 
-	private void linkCruncher(Cruncher cruncher) {
-		linkedCrunchers.getItems().add(cruncher);
-		updateLinkCruncherButtonEnabled();
-	}
+
 	
 	public void removeLinkedCruncher(Cruncher cruncher) {
 		linkedCrunchers.getItems().remove(cruncher);
@@ -206,6 +205,12 @@ public class FileInputView {
 		
 	}
 
+
+	private void linkCruncher(Cruncher cruncher) {
+		linkedCrunchers.getItems().add(cruncher);
+		updateLinkCruncherButtonEnabled();
+	}
+
 	 */
 
 	private void removeDiskInput() {
@@ -219,4 +224,13 @@ public class FileInputView {
 	public FileInput getFileInput() {
 		return fileInput;
 	}
+
+	public ListView<Cruncher> getLinkedCrunchers() {
+		return linkedCrunchers;
+	}
+
+	public ComboBox<Cruncher> getAvailableCrunchers() {
+		return availableCrunchers;
+	}
+
 }

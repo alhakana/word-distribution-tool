@@ -55,4 +55,8 @@ public class CruncherView {
 	public MainView getMainView() {
 		return mainView;
 	}
+
+	public void setStatus(Text status) {
+		this.status = status;
+	}
 }

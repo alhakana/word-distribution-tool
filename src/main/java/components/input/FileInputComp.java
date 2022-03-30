@@ -1,8 +1,11 @@
 package components.input;
 
+import components.Input;
 import components.cruncher.CounterCruncherComp;
 import javafx.scene.text.Text;
 import mvc.app.Config;
+import mvc.model.Cruncher;
+
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,6 +16,7 @@ public class FileInputComp implements Runnable {
 
     private ExecutorService threadPool;
     private final String disc;
+    private Text text;
 
     private List<CounterCruncherComp> crunchers;
     private List<File> directories;
@@ -23,9 +27,11 @@ public class FileInputComp implements Runnable {
     private volatile boolean quit = false;
 
     public FileInputComp(ExecutorService threadPool, String disc, Text text) {
-        this.disc = disc;
-        directories = new CopyOnWriteArrayList<>();
         this.threadPool = threadPool;
+        this.disc = disc;
+        this.text = text;
+
+        directories = new CopyOnWriteArrayList<>();
         lastModify = new ConcurrentHashMap<>();
         crunchers = new CopyOnWriteArrayList<>();
     }
@@ -33,7 +39,7 @@ public class FileInputComp implements Runnable {
     @Override
     public void run() {
         while(!quit) {
-            if (started && running) {
+            if (running) {
                 searchDirectories();
                 sleep(Integer.parseInt(Config.getProperty("file_input_sleep_time")));
             } else
@@ -42,12 +48,11 @@ public class FileInputComp implements Runnable {
     }
 
     public void searchDirectories() {
-        directories.iterator().forEachRemaining(directory -> searchFiles(directory));
+        directories.iterator().forEachRemaining(this::searchFiles);
     }
 
     private void searchFiles(File directory) {
-        List<File> files = new ArrayList<>();
-        files = Arrays.asList(directory.listFiles());
+        List<File> files = Arrays.asList(directory.listFiles());
 
         if (!files.isEmpty()) {
             for (File f : files) {
@@ -62,7 +67,7 @@ public class FileInputComp implements Runnable {
 
     private void isReadable(File file) {
         Long lastModified = lastModify.get(file);
-        if (lastModified == null || !lastModified.equals(file.lastModified())) {
+        if (lastModified == null || lastModified < file.lastModified()) {
             lastModify.put(file, file.lastModified());
             threadPool.execute(new FileReader(file, disc, crunchers));
         }
@@ -76,14 +81,6 @@ public class FileInputComp implements Runnable {
             return name.substring(name.lastIndexOf("."));
 
         return "";
-    }
-
-    public synchronized void start() {
-
-    }
-
-    public synchronized void pause() {
-
     }
 
     private void sleep(int time) {
@@ -110,7 +107,53 @@ public class FileInputComp implements Runnable {
     }
 
     void removeDirectory(File directory) {
+        List<File> files = Collections.synchronizedList(Arrays.asList(directory.listFiles()));
 
+        if (!files.isEmpty()) {
+            for (File f : files) {
+                if (f.isDirectory())
+                    removeDirectory(f);
+                else if (getFileExtension(f).equals(".txt")) {
+                    lastModify.remove(f);
+                }
+            }
+        }
     }
 
+    public void start() {
+        if (!started) {
+            threadPool.execute(this);
+            started = true;
+        }
+
+        running = true;
+        notify();
+    }
+
+    public void pause() {
+        running = false;
+        notify();
+    }
+
+    public void quit() {
+        quit = true;
+        Input input = new Input();
+        sendInput(input);
+    }
+
+    private void sendInput(Input input) {
+        crunchers.iterator().forEachRemaining(counterCruncherComp -> counterCruncherComp.addInput(input));
+    }
+
+    public boolean isStarted() {
+        return started;
+    }
+
+    public void setStarted(boolean started) {
+        this.started = started;
+    }
+
+    public void setRunning(boolean running) {
+        this.running = running;
+    }
 }
