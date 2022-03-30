@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Optional;
 import mvc.app.Config;
+import mvc.controller.AddCruncher;
 import mvc.controller.AddFileInput;
 import mvc.model.Cruncher;
 import mvc.model.Disk;
@@ -128,7 +129,7 @@ public class MainView {
 		VBox.setMargin(text, new Insets(0, 0, 5, 0));
 
 		addCruncher = new Button("Add cruncher");
-		addCruncher.setOnAction(e -> addCruncher());
+		addCruncher.setOnAction(new AddCruncher(this));
 		vBoxCruncher.getChildren().add(addCruncher);
 		VBox.setMargin(addCruncher, new Insets(0, 0, 15, 0));
 

@@ -2,7 +2,9 @@ package components;
 
 import components.cruncher.CounterCruncherComp;
 import components.input.FileInputComp;
+import javafx.scene.control.Label;
 import javafx.scene.text.Text;
+import mvc.model.Directory;
 import mvc.model.FileInput;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
@@ -45,6 +47,7 @@ public class Pools {
 
     public void addCruncherComp(int arity, Text text) {
         CounterCruncherComp counterCruncherComp = new CounterCruncherComp(cruncherThreadPool, arity, text);
+        cruncherComponents.put(arity, counterCruncherComp);
     }
 
     public void removeInputComp() {
@@ -56,11 +59,18 @@ public class Pools {
     }
 
     public void pauseInputFile(String name) {
-        FileInputComp fileInputComp = inputComponents.get(name);
-
-
+        inputComponents.get(name).pause();
     }
 
+    public void linkCruncher(String name, int arity) {
+        CounterCruncherComp counterCruncherComp = cruncherComponents.get(arity);
+        FileInputComp fileInputComp = inputComponents.get(name);
 
+        fileInputComp.addCruncher(counterCruncherComp);
+    }
 
+    public void addDirectory(String name, Directory directory) {
+        inputComponents.get(name).addDirectory(directory.getDirectory());
+
+    }
 }

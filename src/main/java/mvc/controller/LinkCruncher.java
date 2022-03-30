@@ -1,10 +1,10 @@
 package mvc.controller;
 
+import components.Pools;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import mvc.model.Cruncher;
 import mvc.view.FileInputView;
-
-import java.io.File;
 
 public class LinkCruncher implements EventHandler<ActionEvent> {
 
@@ -16,7 +16,9 @@ public class LinkCruncher implements EventHandler<ActionEvent> {
 
     @Override
     public void handle(ActionEvent actionEvent) {
-        fileInputView.getLinkedCrunchers().getItems().add(fileInputView.getAvailableCrunchers().getSelectionModel().getSelectedItem());
+        Cruncher cruncher = fileInputView.getAvailableCrunchers().getSelectionModel().getSelectedItem();
+        fileInputView.getLinkedCrunchers().getItems().add(cruncher);
         fileInputView.updateLinkCruncherButtonEnabled();
+        Pools.getInstance().linkCruncher(fileInputView.getFileInput().getName(), cruncher.getArity());
     }
 }

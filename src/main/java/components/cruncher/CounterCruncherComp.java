@@ -1,6 +1,7 @@
 package components.cruncher;
 
 import components.Input;
+import javafx.scene.control.Label;
 import javafx.scene.text.Text;
 
 import java.util.concurrent.BlockingQueue;

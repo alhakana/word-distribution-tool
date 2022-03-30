@@ -1,6 +1,7 @@
 package components.input;
 
 import components.Input;
+import components.Utils;
 import components.cruncher.CounterCruncherComp;
 import javafx.scene.text.Text;
 import mvc.app.Config;
@@ -8,9 +9,7 @@ import mvc.model.Cruncher;
 
 import java.io.File;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.*;
 
 public class FileInputComp implements Runnable {
 
@@ -40,6 +39,7 @@ public class FileInputComp implements Runnable {
     public void run() {
         while(!quit) {
             if (running) {
+//                System.out.println("running " + disc);
                 searchDirectories();
                 sleep(Integer.parseInt(Config.getProperty("file_input_sleep_time")));
             } else
@@ -66,10 +66,17 @@ public class FileInputComp implements Runnable {
     }
 
     private void isReadable(File file) {
+//        System.out.println("is readable");
         Long lastModified = lastModify.get(file);
         if (lastModified == null || lastModified < file.lastModified()) {
             lastModify.put(file, file.lastModified());
-            threadPool.execute(new FileReader(file, disc, crunchers));
+            Utils.notifyPlatform(text, "File input started reading on " + disc);
+            Future<Input> input = threadPool.submit(new FileReader(file, disc, crunchers));
+            try {
+                sendInput(input.get());
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -83,7 +90,7 @@ public class FileInputComp implements Runnable {
         return "";
     }
 
-    private void sleep(int time) {
+    private synchronized void sleep(int time) {
         try {
             if (time == 0)
                 wait();
@@ -120,7 +127,7 @@ public class FileInputComp implements Runnable {
         }
     }
 
-    public void start() {
+    public synchronized void start() {
         if (!started) {
             threadPool.execute(this);
             started = true;
@@ -130,7 +137,7 @@ public class FileInputComp implements Runnable {
         notify();
     }
 
-    public void pause() {
+    public synchronized void pause() {
         running = false;
         notify();
     }
@@ -145,15 +152,4 @@ public class FileInputComp implements Runnable {
         crunchers.iterator().forEachRemaining(counterCruncherComp -> counterCruncherComp.addInput(input));
     }
 
-    public boolean isStarted() {
-        return started;
-    }
-
-    public void setStarted(boolean started) {
-        this.started = started;
-    }
-
-    public void setRunning(boolean running) {
-        this.running = running;
-    }
 }

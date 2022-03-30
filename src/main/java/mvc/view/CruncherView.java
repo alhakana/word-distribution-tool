@@ -56,7 +56,8 @@ public class CruncherView {
 		return mainView;
 	}
 
-	public void setStatus(Text status) {
-		this.status = status;
+	public void setStatus(Text text) {
+		main.getChildren().remove(status);
+		main.getChildren().add(text);
 	}
 }

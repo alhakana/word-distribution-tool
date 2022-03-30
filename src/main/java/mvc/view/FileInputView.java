@@ -3,6 +3,7 @@ package mvc.view;
 import java.io.File;
 import java.util.ArrayList;
 
+import components.Pools;
 import mvc.controller.LinkCruncher;
 import mvc.controller.StartFileInput;
 import mvc.model.Cruncher;
@@ -194,6 +195,7 @@ public class FileInputView {
 			}
 			Directory directory = new Directory(fileDirectory);
 			directories.getItems().add(directory);
+			Pools.getInstance().addDirectory(fileInput.getName(), directory);
 		}
 	}
 
@@ -218,7 +220,8 @@ public class FileInputView {
 	}
 	
 	public void setStatus(Text text) {
-		this.status = text;
+		main.getChildren().remove(status);
+		main.getChildren().add(text);
 	}
 	
 	public FileInput getFileInput() {
