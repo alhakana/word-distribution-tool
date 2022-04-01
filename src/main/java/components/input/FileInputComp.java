@@ -5,21 +5,19 @@ import components.Utils;
 import components.cruncher.CounterCruncherComp;
 import javafx.scene.text.Text;
 import mvc.app.Config;
-import mvc.model.Cruncher;
-
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.*;
 
 public class FileInputComp implements Runnable {
 
-    private ExecutorService threadPool;
+    private final ExecutorService threadPool;
     private final String disc;
-    private Text text;
+    private final Text text;
 
-    private List<CounterCruncherComp> crunchers;
-    private List<File> directories;
-    private Map<File, Long> lastModify;
+    private final List<CounterCruncherComp> crunchers;
+    private final List<File> directories;
+    private final Map<File, Long> lastModify;
 
     private volatile boolean started = false;
     private volatile boolean running = false;
@@ -52,7 +50,11 @@ public class FileInputComp implements Runnable {
     }
 
     private void searchFiles(File directory) {
-        List<File> files = Arrays.asList(directory.listFiles());
+        File[] filesArray = directory.listFiles();
+        if (filesArray == null)
+            return;
+
+        List<File> files = Arrays.asList(filesArray);
 
         if (!files.isEmpty()) {
             for (File f : files) {
@@ -81,7 +83,7 @@ public class FileInputComp implements Runnable {
     }
 
     private String getFileExtension(File directory) {
-        if (directory == null || directory.getName() == null)
+        if (directory == null)
             return "";
         String name = directory.getName().toLowerCase();
         if (directory.getName().contains("."))
@@ -114,7 +116,10 @@ public class FileInputComp implements Runnable {
     }
 
     void removeDirectory(File directory) {
-        List<File> files = Collections.synchronizedList(Arrays.asList(directory.listFiles()));
+        File[] filesArray = directory.listFiles();
+        if (filesArray == null)
+            return;
+        List<File> files = Collections.synchronizedList(Arrays.asList(filesArray));
 
         if (!files.isEmpty()) {
             for (File f : files) {
@@ -133,6 +138,7 @@ public class FileInputComp implements Runnable {
             started = true;
         }
 
+        Utils.notifyPlatform(text, "File input started");
         running = true;
         notify();
     }
@@ -140,6 +146,7 @@ public class FileInputComp implements Runnable {
     public synchronized void pause() {
         running = false;
         notify();
+        Utils.notifyPlatform(text, "File input paused");
     }
 
     public void quit() {

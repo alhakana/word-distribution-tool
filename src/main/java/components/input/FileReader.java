@@ -24,15 +24,13 @@ public class FileReader implements Callable<Input> {
     @Override
     public Input call() throws Exception {
         synchronized (disc) {
-            System.out.println("ovvdeee");
             FileInputStream fileInputStream = new FileInputStream(file);
             byte[] text = new byte[(int) file.length()];
             fileInputStream.read(text);
             fileInputStream.close();
 
-            System.out.println("ovde2");
-            System.out.println(new String(text));
-            System.out.println(new String(text, StandardCharsets.US_ASCII));
+//            System.out.println("ovde2");
+//            System.out.println(new String(text));
 
             return new Input(file.getName(), new String(text));
         }
