@@ -23,12 +23,12 @@ public class AddFileInput implements EventHandler<ActionEvent> {
         FileInput fileInput = new FileInput(mainView.getComboBoxDisks().getSelectionModel().getSelectedItem());
         FileInputView fileInputView = new FileInputView(fileInput, mainView);
         Text text = new Text("Idle input");
-        fileInputView.setStatus(text);
+//        fileInputView.setStatus(text);
 
         Pools.getInstance().addInputComp(fileInput, text);
 
         mainView.getVBoxFileInput().getChildren().add(fileInputView.getFileInputView());
-        VBox.setMargin(fileInputView.getFileInputView(), new Insets(0, 0, 30, 0));
+//        VBox.setMargin(fileInputView.getFileInputView(), new Insets(0, 0, 30, 0));
         fileInputView.getFileInputView().getStyleClass().add("file-input");
 
         mainView.getFileInputViews().add(fileInputView);

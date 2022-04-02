@@ -2,13 +2,13 @@ package components;
 
 import components.cruncher.CounterCruncherComp;
 import components.input.FileInputComp;
-import javafx.scene.control.Label;
 import javafx.scene.text.Text;
 import mvc.model.Directory;
 import mvc.model.FileInput;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 
 public class Pools {
 
@@ -17,14 +17,14 @@ public class Pools {
     private ExecutorService inputThreadPool;
     private HashMap<String, FileInputComp> inputComponents;
 
-    private ExecutorService cruncherThreadPool;
+    private ForkJoinPool cruncherThreadPool;
     private HashMap<Integer, CounterCruncherComp> cruncherComponents;
 
     private Pools() {
         inputThreadPool = Executors.newCachedThreadPool();
         inputComponents = new HashMap<>();
 
-//        cruncherThreadPool = 
+        cruncherThreadPool = new ForkJoinPool();
         cruncherComponents = new HashMap<>();
     }
 
@@ -55,6 +55,8 @@ public class Pools {
     }
 
     public void startInputFile(String name) {
+
+        System.out.println("startovan input");
         inputComponents.get(name).start();
     }
 

@@ -35,9 +35,12 @@ public class FileInputComp implements Runnable {
 
     @Override
     public void run() {
+//        System.out.println("running " + disc);
+
         while(!quit) {
+            System.out.println("while petlja input");
             if (running) {
-//                System.out.println("running " + disc);
+                System.out.println("running!!!");
                 searchDirectories();
                 sleep(Integer.parseInt(Config.getProperty("file_input_sleep_time")));
             } else
@@ -50,6 +53,7 @@ public class FileInputComp implements Runnable {
     }
 
     private void searchFiles(File directory) {
+//        System.out.println("searching directories");
         File[] filesArray = directory.listFiles();
         if (filesArray == null)
             return;
@@ -57,10 +61,14 @@ public class FileInputComp implements Runnable {
         List<File> files = Arrays.asList(filesArray);
 
         if (!files.isEmpty()) {
+//            System.out.println("searching files");
             for (File f : files) {
-                if (f.isDirectory())
+                if (f.isDirectory()) {
+//                    System.out.println("searching directory " + f.getName());
                     searchFiles(f);
+                }
                 else if (getFileExtension(f).equals(".txt")) {
+//                    System.out.println("searching file " + f.getName());
                     isReadable(f);
                 }
             }
@@ -72,10 +80,11 @@ public class FileInputComp implements Runnable {
         Long lastModified = lastModify.get(file);
         if (lastModified == null || lastModified < file.lastModified()) {
             lastModify.put(file, file.lastModified());
-            Utils.notifyPlatform(text, "File input started reading on " + disc);
+            Utils.notifyPlatform(text, text.getText() + "\n" + file.getName());
             Future<Input> input = threadPool.submit(new FileReader(file, disc, crunchers));
             try {
                 sendInput(input.get());
+//                System.out.println("poslat input");
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
@@ -134,12 +143,12 @@ public class FileInputComp implements Runnable {
 
     public synchronized void start() {
         if (!started) {
-            threadPool.execute(this);
             started = true;
+            running = true;
+            threadPool.execute(this);
         }
-
-        Utils.notifyPlatform(text, "File input started");
         running = true;
+        Utils.notifyPlatform(text, "File input started");
         notify();
     }
 

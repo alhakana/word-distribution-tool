@@ -29,7 +29,7 @@ public class FileReader implements Callable<Input> {
             fileInputStream.read(text);
             fileInputStream.close();
 
-//            System.out.println("ovde2");
+            System.out.println("gotovo citanje");
 //            System.out.println(new String(text));
 
             return new Input(file.getName(), new String(text));

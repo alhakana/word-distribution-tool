@@ -2,17 +2,17 @@ package components.cruncher;
 
 import components.Input;
 import components.Output;
+import components.Utils;
 import components.output.CacheOutputComp;
 import javafx.scene.text.Text;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.Map;
+import java.util.concurrent.*;
 
 public class CounterCruncherComp implements Runnable{
 
-    private ExecutorService threadPool;
+    private ForkJoinPool threadPool;
     private int arity;
     private Text text;
 
@@ -20,13 +20,15 @@ public class CounterCruncherComp implements Runnable{
     private List<CacheOutputComp> caches;
 
 
-    public CounterCruncherComp(ExecutorService threadPool, Integer arity, Text text) {
+    public CounterCruncherComp(ForkJoinPool threadPool, Integer arity, Text text) {
         this.threadPool = threadPool;
         this.arity = arity;
         this.text = text;
 
         inputs = new LinkedBlockingQueue<>();
         caches = new ArrayList<>();
+
+        threadPool.execute(this);
     }
 
     public void addInput(Input input) {
@@ -42,17 +44,22 @@ public class CounterCruncherComp implements Runnable{
     public void run() {
         while(true) {
             try {
+                System.out.println("pokrenut cruncher");
                 Input input = inputs.take();
                 if (input.getName().equals("")) {
                     sendOutput(new Output("", null));
                     break;
                 }
 
+                System.out.println("stigao inputs");
+                Utils.notifyPlatform(text, text.getText() + "\n" + input.getName());
+                String inputText = input.getText();
+                Future<Map<String, Integer>> futureResult = threadPool.submit(new FileCruncher(inputText, arity, 0, inputText.length()));
 
+                Output output = new Output(input.getName()+"-arity"+arity, futureResult);
+                sendOutput(output);
 
-
-
-
+                Utils.notifyPlatform(text, text.getText().replace("\n", "\n"));
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
