@@ -14,12 +14,12 @@ import java.util.concurrent.*;
 
 public class CounterCruncherComp implements Runnable{
 
-    private ForkJoinPool threadPool;
-    private int arity;
-    private Text text;
+    private final ForkJoinPool threadPool;
+    private final int arity;
+    private final Text text;
 
-    private BlockingQueue<Input> inputs;
-    private List<CacheOutputComp> caches;
+    private final BlockingQueue<Input> inputs;
+    private final List<CacheOutputComp> caches;
 
     public static int L = Integer.parseInt(Config.getProperty("counter_data_limit"));
 

@@ -202,18 +202,6 @@ public class FileInputView {
 	private void removeDirectory(Directory directory) {
 		directories.getItems().remove(directory);
 	}
-	/*
-	private void start() {
-		
-	}
-
-
-	private void linkCruncher(Cruncher cruncher) {
-		linkedCrunchers.getItems().add(cruncher);
-		updateLinkCruncherButtonEnabled();
-	}
-
-	 */
 
 	private void removeDiskInput() {
 		mainView.removeFileInputView(this);

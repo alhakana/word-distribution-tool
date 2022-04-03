@@ -7,6 +7,8 @@ import javafx.collections.ObservableList;
 import javafx.scene.text.Text;
 import mvc.model.Directory;
 import mvc.model.FileInput;
+import mvc.model.FileOutput;
+
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -63,7 +65,6 @@ public class Pools {
     }
 
     public void startInputFile(String name) {
-//        System.out.println("startovan input");
         inputComponents.get(name).start();
     }
 
@@ -82,7 +83,15 @@ public class Pools {
         inputComponents.get(name).addDirectory(directory.getDirectory());
     }
 
-    public void addObservable(ObservableList<Output> observableList) {
+    public void addObservable(ObservableList<FileOutput> observableList) {
         output = new CacheOutputComp(outputThreadPool, observableList);
+    }
+
+    public CacheOutputComp getOutput() {
+        return output;
+    }
+
+    public ExecutorService getOutputThreadPool() {
+        return outputThreadPool;
     }
 }

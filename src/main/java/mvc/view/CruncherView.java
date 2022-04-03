@@ -9,11 +9,11 @@ import javafx.scene.text.Text;
 
 public class CruncherView {
 
-	private MainView mainView;
-	private Cruncher cruncher;
-	private Text status;
+	private final MainView mainView;
+	private final Cruncher cruncher;
+	private final Text status;
 
-	private Pane main;
+	private final Pane main;
 
 	public CruncherView(MainView mainView, Cruncher cruncher) {
 		this.mainView = mainView;
@@ -50,10 +50,6 @@ public class CruncherView {
 
 	public Cruncher getCruncher() {
 		return cruncher;
-	}
-
-	public MainView getMainView() {
-		return mainView;
 	}
 
 	public void setStatus(Text text) {

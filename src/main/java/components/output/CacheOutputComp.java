@@ -2,6 +2,7 @@ package components.output;
 
 import components.Output;
 import javafx.collections.ObservableList;
+import mvc.model.FileOutput;
 
 import java.util.Map;
 import java.util.concurrent.*;
@@ -11,11 +12,13 @@ public class CacheOutputComp implements Runnable{
     private BlockingQueue<Output> outputs;
     private ExecutorService threadPool;
     private Map<String, Future<Map<String, Integer>>> result;
+    private ObservableList<FileOutput> observableList;
 
-    public CacheOutputComp(ExecutorService threadPool, ObservableList<Output> observableList) {
+    public CacheOutputComp(ExecutorService threadPool, ObservableList<FileOutput> observableList) {
         this.threadPool = threadPool;
         outputs = new LinkedBlockingQueue<>();
         result = new ConcurrentHashMap<>();
+        this.observableList = observableList;
 
         threadPool.execute(this);
     }
@@ -36,9 +39,7 @@ public class CacheOutputComp implements Runnable{
                 if (output.getName().equals(""))
                     break;
 
-
-
-
+                threadPool.execute(new BagShower(output, this));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -62,4 +63,13 @@ public class CacheOutputComp implements Runnable{
     }
 
 //     agregacija
+
+
+    public Map<String, Future<Map<String, Integer>>> getResult() {
+        return result;
+    }
+
+    public ObservableList<FileOutput> getObservableList() {
+        return observableList;
+    }
 }

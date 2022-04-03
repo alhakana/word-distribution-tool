@@ -2,31 +2,32 @@ package mvc.view;
 
 import java.io.File;
 import java.util.ArrayList;
-import components.Output;
+import java.util.Map;
+
+import components.Pools;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.chart.XYChart;
+import javafx.scene.control.*;
 import mvc.app.Config;
 import mvc.controller.AddCruncher;
 import mvc.controller.AddFileInput;
+import mvc.controller.GetSingleResult;
+import mvc.controller.SumResults;
 import mvc.model.Cruncher;
 import mvc.model.Disk;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import mvc.model.FileOutput;
 
 public class MainView {
 
@@ -35,13 +36,13 @@ public class MainView {
 	private HBox left;
 	private VBox vBoxFileInput, vBoxCruncher;
 	private Pane right;
-	private ListView<Output> results;
-	private ObservableList<Output> resultList;
+	private ListView<FileOutput> results;
+	private ObservableList<FileOutput> resultList;
 	private Button addFileInput, singleResult, sumResult;
 	private ArrayList<FileInputView> fileInputViews;
 	private LineChart<Number, Number> lineChart;
 	private ArrayList<Cruncher> availableCrunchers;
-	private Button addCruncher;
+	private ProgressBar progressBar;
 
 	public void initMainView(BorderPane borderPane, Stage stage) {
 		this.stage = stage;
@@ -130,7 +131,7 @@ public class MainView {
 		vBoxCruncher.getChildren().add(text);
 		VBox.setMargin(text, new Insets(0, 0, 5, 0));
 
-		addCruncher = new Button("Add cruncher");
+		Button addCruncher = new Button("Add cruncher");
 		addCruncher.setOnAction(new AddCruncher(this));
 		vBoxCruncher.getChildren().add(addCruncher);
 		VBox.setMargin(addCruncher, new Insets(0, 0, 15, 0));
@@ -167,6 +168,7 @@ public class MainView {
 		results = new ListView<>();
 		resultList = FXCollections.observableArrayList();
 		results.setItems(resultList);
+		Pools.getInstance().addObservable(resultList);
 		right.getChildren().add(results);
 		VBox.setMargin(results, new Insets(0, 0, 10, 0));
 		results.getSelectionModel().selectedItemProperty().addListener(e -> updateResultButtons());
@@ -174,16 +176,18 @@ public class MainView {
 		results.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
 		singleResult = new Button("Single result");
-		singleResult.setOnAction(e -> getSingleResult());
+		singleResult.setOnAction(new GetSingleResult(this));
 		singleResult.setDisable(true);
 		right.getChildren().add(singleResult);
 		VBox.setMargin(singleResult, new Insets(0, 0, 5, 0));
 
 		sumResult = new Button("Sum results");
 		sumResult.setDisable(true);
-		sumResult.setOnAction(e -> sumResults());
+		sumResult.setOnAction(new SumResults());
 		right.getChildren().add(sumResult);
 		VBox.setMargin(sumResult, new Insets(0, 0, 10, 0));
+
+		progressBar = new ProgressBar();
 
 		borderPane.setRight(right);
 	}
@@ -217,13 +221,7 @@ public class MainView {
 		}
 	}
 
-	private void getSingleResult() {
-		
-	}
 
-	private void sumResults() {
-		
-	}
 
 	public void removeFileInputView(FileInputView fileInputView) {
 		vBoxFileInput.getChildren().remove(fileInputView.getFileInputView());
@@ -284,21 +282,31 @@ public class MainView {
 		return availableCrunchers;
 	}
 
+	public ListView<FileOutput> getResults() {
+		return results;
+	}
+
+	public ProgressBar getProgressBar() {
+		return progressBar;
+	}
+
+	public void updateChart(Map<Number, Number> resultUpdate, String fileName) {
+		lineChart.getData().clear();
+		XYChart.Series<Number, Number> xy = new XYChart.Series<>();
+		xy.setName(fileName);
+		resultUpdate.forEach((x, y) -> {
+			xy.getData().add(new XYChart.Data<>(x, y));
+		});
+
+		lineChart.getData().add(xy);
+	}
+
+	public void removeAndResetProgressBar() {
+		right.getChildren().remove(progressBar);
+		progressBar = new ProgressBar();
+	}
 
 	/*
-		private static MainView instance;
-
-
-	private MainView() {
-
-	}
-
-	public static MainView getInstance() {
-		if (instance == null)
-			instance = new MainView();
-		return instance;
-	}
-
 	public void addFileInput(FileInput fileInput) {
 		FileInputView fileInputView = new FileInputView(fileInput, this);
 		this.vBoxFileInput.getChildren().add(fileInputView.getFileInputView());
@@ -342,6 +350,14 @@ public class MainView {
 				alert.showAndWait();
 			}
 		});
+	}
+
+		private void getSingleResult() {
+
+	}
+
+	private void sumResults() {
+
 	}
 	*/
 }

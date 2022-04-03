@@ -1,7 +1,9 @@
 package components;
 
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.scene.text.Text;
+import mvc.model.FileOutput;
 
 public class Utils {
 
@@ -17,9 +19,18 @@ public class Utils {
         }
     }
 
-    public static void notifyPlatformReplace(Text text, String string, int arity) {
-        synchronized (text) {
-            Platform.runLater(() -> text.setText(text.getText().replace(string, string+"-arity"+arity)));
-        }
+    public static void updateList(ObservableList<FileOutput> observableList, FileOutput fileOutput) {
+        Platform.runLater(() -> {
+            if (!observableList.contains(fileOutput))
+                observableList.add(fileOutput);
+        });
+    }
+
+    public static void removeAndUpdateList(ObservableList<FileOutput> observableList, FileOutput fileOutput) {
+        Platform.runLater(() -> {
+            observableList.remove(fileOutput);
+            fileOutput.setDone(true);
+            observableList.add(fileOutput);
+        });
     }
 }
