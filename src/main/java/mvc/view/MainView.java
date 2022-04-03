@@ -2,7 +2,9 @@ package mvc.view;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Optional;
+import components.Output;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import mvc.app.Config;
 import mvc.controller.AddCruncher;
 import mvc.controller.AddFileInput;
@@ -19,7 +21,6 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -33,8 +34,9 @@ public class MainView {
 	private ComboBox<Disk> disks;
 	private HBox left;
 	private VBox vBoxFileInput, vBoxCruncher;
-	private Pane center, right;
-	private ListView<String> results;
+	private Pane right;
+	private ListView<Output> results;
+	private ObservableList<Output> resultList;
 	private Button addFileInput, singleResult, sumResult;
 	private ArrayList<FileInputView> fileInputViews;
 	private LineChart<Number, Number> lineChart;
@@ -143,7 +145,7 @@ public class MainView {
 	}
 
 	private void initCenter(BorderPane borderPane) {
-		center = new HBox();
+		Pane center = new HBox();
 
 		final NumberAxis xAxis = new NumberAxis();
 		final NumberAxis yAxis = new NumberAxis();
@@ -163,6 +165,8 @@ public class MainView {
 		right.setMaxWidth(200);
 
 		results = new ListView<>();
+		resultList = FXCollections.observableArrayList();
+		results.setItems(resultList);
 		right.getChildren().add(results);
 		VBox.setMargin(results, new Insets(0, 0, 10, 0));
 		results.getSelectionModel().selectedItemProperty().addListener(e -> updateResultButtons());
@@ -238,38 +242,7 @@ public class MainView {
 		return stage;
 	}
 
-	private void addCruncher() {
-		TextInputDialog dialog = new TextInputDialog("1");
-		dialog.setTitle("Add cruncher");
-		dialog.setHeaderText("Enter cruncher arity");
 
-		Optional<String> result = dialog.showAndWait();
-		result.ifPresent(res -> {
-			try {
-				int arity = Integer.parseInt(res);
-				for (Cruncher cruncher : availableCrunchers) {
-					if (cruncher.getArity() == arity) {
-						Alert alert = new Alert(AlertType.WARNING);
-						alert.setTitle("Error");
-						alert.setHeaderText("Cruncher with this arity already exists.");
-						alert.setContentText(null);
-						alert.showAndWait();
-						return;
-					}
-				}
-				Cruncher cruncher = new Cruncher(arity);
-				CruncherView cruncherView = new CruncherView(this, cruncher);
-				this.vBoxCruncher.getChildren().add(cruncherView.getCruncherView());
-				availableCrunchers.add(cruncher);
-				updateCrunchers(availableCrunchers);
-			} catch (NumberFormatException e) {
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("Wrong input");
-				alert.setHeaderText("Arity must be a number");
-				alert.showAndWait();
-			}
-		});
-	}
 
 	public void stopCrunchers() {
 		
@@ -300,7 +273,7 @@ public class MainView {
 		return vBoxFileInput;
 	}
 
-	public VBox getvBoxCruncher() {
+	public VBox getVBoxCruncher() {
 		return vBoxCruncher;
 	}
 	public ArrayList<FileInputView> getFileInputViews() {
@@ -336,6 +309,39 @@ public class MainView {
 			fileInputView.updateAvailableCrunchers(availableCrunchers);
 		}
 		updateEnableAddFileInput();
+	}
+
+	private void addCruncher() {
+		TextInputDialog dialog = new TextInputDialog("1");
+		dialog.setTitle("Add cruncher");
+		dialog.setHeaderText("Enter cruncher arity");
+
+		Optional<String> result = dialog.showAndWait();
+		result.ifPresent(res -> {
+			try {
+				int arity = Integer.parseInt(res);
+				for (Cruncher cruncher : availableCrunchers) {
+					if (cruncher.getArity() == arity) {
+						Alert alert = new Alert(AlertType.WARNING);
+						alert.setTitle("Error");
+						alert.setHeaderText("Cruncher with this arity already exists.");
+						alert.setContentText(null);
+						alert.showAndWait();
+						return;
+					}
+				}
+				Cruncher cruncher = new Cruncher(arity);
+				CruncherView cruncherView = new CruncherView(this, cruncher);
+				this.vBoxCruncher.getChildren().add(cruncherView.getCruncherView());
+				availableCrunchers.add(cruncher);
+				updateCrunchers(availableCrunchers);
+			} catch (NumberFormatException e) {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Wrong input");
+				alert.setHeaderText("Arity must be a number");
+				alert.showAndWait();
+			}
+		});
 	}
 	*/
 }

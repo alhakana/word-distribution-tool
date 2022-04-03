@@ -1,5 +1,7 @@
 package components;
 
+import java.lang.ref.WeakReference;
+
 public class Input {
     private String name;
     private String text;

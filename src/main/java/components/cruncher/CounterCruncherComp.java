@@ -5,6 +5,8 @@ import components.Output;
 import components.Utils;
 import components.output.CacheOutputComp;
 import javafx.scene.text.Text;
+import mvc.app.Config;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +21,7 @@ public class CounterCruncherComp implements Runnable{
     private BlockingQueue<Input> inputs;
     private List<CacheOutputComp> caches;
 
+    public static int L = Integer.parseInt(Config.getProperty("counter_data_limit"));
 
     public CounterCruncherComp(ForkJoinPool threadPool, Integer arity, Text text) {
         this.threadPool = threadPool;
@@ -44,7 +47,7 @@ public class CounterCruncherComp implements Runnable{
     public void run() {
         while(true) {
             try {
-                System.out.println("pokrenut cruncher");
+//                System.out.println("pokrenut cruncher");
                 Input input = inputs.take();
                 if (input.getName().equals("")) {
                     sendOutput(new Output("", null));
@@ -52,15 +55,12 @@ public class CounterCruncherComp implements Runnable{
                 }
 
                 System.out.println("stigao inputs");
-                Utils.notifyPlatform(text, text.getText() + "\n" + input.getName());
+                Utils.notifyPlatformAppend(text, input.getName());
                 String inputText = input.getText();
                 Future<Map<String, Integer>> futureResult = threadPool.submit(new FileCruncher(inputText, arity, 0, inputText.length()));
 
                 Output output = new Output(input.getName()+"-arity"+arity, futureResult);
                 sendOutput(output);
-
-                Utils.notifyPlatform(text, text.getText().replace("\n", "\n"));
-
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

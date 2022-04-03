@@ -2,6 +2,8 @@ package components;
 
 import components.cruncher.CounterCruncherComp;
 import components.input.FileInputComp;
+import components.output.CacheOutputComp;
+import javafx.collections.ObservableList;
 import javafx.scene.text.Text;
 import mvc.model.Directory;
 import mvc.model.FileInput;
@@ -20,12 +22,17 @@ public class Pools {
     private ForkJoinPool cruncherThreadPool;
     private HashMap<Integer, CounterCruncherComp> cruncherComponents;
 
+    private ExecutorService outputThreadPool;
+    private CacheOutputComp output;
+
     private Pools() {
         inputThreadPool = Executors.newCachedThreadPool();
         inputComponents = new HashMap<>();
 
-        cruncherThreadPool = new ForkJoinPool();
+        cruncherThreadPool = ForkJoinPool.commonPool();
         cruncherComponents = new HashMap<>();
+
+        outputThreadPool = Executors.newCachedThreadPool();
     }
 
     public static Pools getInstance() {
@@ -47,6 +54,7 @@ public class Pools {
 
     public void addCruncherComp(int arity, Text text) {
         CounterCruncherComp counterCruncherComp = new CounterCruncherComp(cruncherThreadPool, arity, text);
+        counterCruncherComp.addCache(output);
         cruncherComponents.put(arity, counterCruncherComp);
     }
 
@@ -55,8 +63,7 @@ public class Pools {
     }
 
     public void startInputFile(String name) {
-
-        System.out.println("startovan input");
+//        System.out.println("startovan input");
         inputComponents.get(name).start();
     }
 
@@ -73,6 +80,9 @@ public class Pools {
 
     public void addDirectory(String name, Directory directory) {
         inputComponents.get(name).addDirectory(directory.getDirectory());
+    }
 
+    public void addObservable(ObservableList<Output> observableList) {
+        output = new CacheOutputComp(outputThreadPool, observableList);
     }
 }

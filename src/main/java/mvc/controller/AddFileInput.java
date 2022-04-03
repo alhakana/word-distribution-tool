@@ -22,8 +22,8 @@ public class AddFileInput implements EventHandler<ActionEvent> {
     public void handle(ActionEvent actionEvent) {
         FileInput fileInput = new FileInput(mainView.getComboBoxDisks().getSelectionModel().getSelectedItem());
         FileInputView fileInputView = new FileInputView(fileInput, mainView);
-        Text text = new Text("Idle input");
-//        fileInputView.setStatus(text);
+        Text text = new Text("Idle file input");
+        fileInputView.setStatus(text);
 
         Pools.getInstance().addInputComp(fileInput, text);
 

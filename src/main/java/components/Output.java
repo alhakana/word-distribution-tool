@@ -1,6 +1,7 @@
 package components;
 
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class Output {
@@ -10,5 +11,13 @@ public class Output {
     public Output(String name, Future<Map<String, Integer>> bagOfWords) {
         this.name = name;
         this.bagOfWords = bagOfWords;
+    }
+
+    public Future<Map<String, Integer>> getBagOfWords() {
+        return bagOfWords;
+    }
+
+    public String getName() {
+        return name;
     }
 }

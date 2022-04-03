@@ -1,12 +1,9 @@
 package mvc.controller;
 
 import components.Pools;
-import components.Utils;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.text.Text;
 import mvc.model.Cruncher;
@@ -48,13 +45,10 @@ public class AddCruncher implements EventHandler<ActionEvent> {
                 CruncherView cruncherView = new CruncherView(mainView, cruncher);
                 Text text = new Text("Idle cruncher");
                 cruncherView.setStatus(text);
-//                cruncherView.
-//                Utils.notifyPlatform(text, "Idle cruncher");
-//                Platform.runLater(()-> cruncherView.setStatus(text));
                 System.out.println("ovde");
                 Pools.getInstance().addCruncherComp(arity, text);
 
-                mainView.getvBoxCruncher().getChildren().add(cruncherView.getCruncherView());
+                mainView.getVBoxCruncher().getChildren().add(cruncherView.getCruncherView());
                 availableCrunchers.add(cruncher);
                 mainView.updateCrunchers(availableCrunchers);
             } catch (NumberFormatException e) {

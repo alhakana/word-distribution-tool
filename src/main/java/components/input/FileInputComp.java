@@ -38,7 +38,7 @@ public class FileInputComp implements Runnable {
 //        System.out.println("running " + disc);
 
         while(!quit) {
-            System.out.println("while petlja input");
+//            System.out.println("while petlja input");
             if (running) {
                 System.out.println("running!!!");
                 searchDirectories();
@@ -80,14 +80,10 @@ public class FileInputComp implements Runnable {
         Long lastModified = lastModify.get(file);
         if (lastModified == null || lastModified < file.lastModified()) {
             lastModify.put(file, file.lastModified());
-            Utils.notifyPlatform(text, text.getText() + "\n" + file.getName());
-            Future<Input> input = threadPool.submit(new FileReader(file, disc, crunchers));
-            try {
-                sendInput(input.get());
-//                System.out.println("poslat input");
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
+            System.out.println("Reading: " + file.getName());
+            threadPool.execute(() ->Utils.notifyPlatformAppend(text, file.getName()));
+            threadPool.execute(new FileReader(file, this));
+//            this.sleep(500);
         }
     }
 
@@ -101,7 +97,7 @@ public class FileInputComp implements Runnable {
         return "";
     }
 
-    private synchronized void sleep(int time) {
+    public synchronized void sleep(int time) {
         try {
             if (time == 0)
                 wait();
@@ -148,14 +144,14 @@ public class FileInputComp implements Runnable {
             threadPool.execute(this);
         }
         running = true;
-        Utils.notifyPlatform(text, "File input started");
+        Utils.notifyPlatformReset(text, "File input started");
         notify();
     }
 
     public synchronized void pause() {
         running = false;
         notify();
-        Utils.notifyPlatform(text, "File input paused");
+        Utils.notifyPlatformReset(text, "File input paused");
     }
 
     public void quit() {
@@ -164,8 +160,13 @@ public class FileInputComp implements Runnable {
         sendInput(input);
     }
 
-    private void sendInput(Input input) {
+    public void sendInput(Input input) {
         crunchers.iterator().forEachRemaining(counterCruncherComp -> counterCruncherComp.addInput(input));
     }
+
+    public String getDisc() {
+        return disc;
+    }
+
 
 }
