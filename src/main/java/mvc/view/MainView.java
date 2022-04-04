@@ -37,7 +37,6 @@ public class MainView {
 	private VBox vBoxFileInput, vBoxCruncher;
 	private Pane right;
 	private ListView<FileOutput> results;
-	private ObservableList<FileOutput> resultList;
 	private Button addFileInput, singleResult, sumResult;
 	private ArrayList<FileInputView> fileInputViews;
 	private LineChart<Number, Number> lineChart;
@@ -58,6 +57,12 @@ public class MainView {
 
 		initCenter(borderPane);
 		initRight(borderPane);
+
+		initShutDownApp();
+	}
+
+	private void initShutDownApp() {
+		stage.setOnCloseRequest(e -> new Thread(() -> Pools.getInstance().shutDownPools()).start());
 	}
 
 	private void initFileInput() {
@@ -166,7 +171,7 @@ public class MainView {
 		right.setMaxWidth(200);
 
 		results = new ListView<>();
-		resultList = FXCollections.observableArrayList();
+		ObservableList<FileOutput> resultList = FXCollections.observableArrayList();
 		results.setItems(resultList);
 		Pools.getInstance().addObservable(resultList);
 		right.getChildren().add(results);
@@ -183,7 +188,7 @@ public class MainView {
 
 		sumResult = new Button("Sum results");
 		sumResult.setDisable(true);
-		sumResult.setOnAction(new SumResults());
+		sumResult.setOnAction(new SumResults(this));
 		right.getChildren().add(sumResult);
 		VBox.setMargin(sumResult, new Insets(0, 0, 10, 0));
 
@@ -224,6 +229,8 @@ public class MainView {
 
 
 	public void removeFileInputView(FileInputView fileInputView) {
+		Pools.getInstance().removeInputComp(fileInputView.getFileInput().getName());
+
 		vBoxFileInput.getChildren().remove(fileInputView.getFileInputView());
 		fileInputViews.remove(fileInputView);
 		updateEnableAddFileInput();
@@ -240,20 +247,11 @@ public class MainView {
 		return stage;
 	}
 
-
-
-	public void stopCrunchers() {
-		
-	}
-
-	public void stopFileInputs() {
-		
-	}
-
 	public void removeCruncher(CruncherView cruncherView) {
 		for (FileInputView fileInputView : fileInputViews) {
 			fileInputView.removeLinkedCruncher(cruncherView.getCruncher());
 		}
+		Pools.getInstance().removeCruncher(cruncherView.getCruncher().getArity());
 		availableCrunchers.remove(cruncherView.getCruncher());
 		updateCrunchers(availableCrunchers);
 		vBoxCruncher.getChildren().remove(cruncherView.getCruncherView());
@@ -274,6 +272,7 @@ public class MainView {
 	public VBox getVBoxCruncher() {
 		return vBoxCruncher;
 	}
+
 	public ArrayList<FileInputView> getFileInputViews() {
 		return fileInputViews;
 	}
@@ -294,9 +293,7 @@ public class MainView {
 		lineChart.getData().clear();
 		XYChart.Series<Number, Number> xy = new XYChart.Series<>();
 		xy.setName(fileName);
-		resultUpdate.forEach((x, y) -> {
-			xy.getData().add(new XYChart.Data<>(x, y));
-		});
+		resultUpdate.forEach((Number x, Number y) -> xy.getData().add(new XYChart.Data<>(x, y)));
 
 		lineChart.getData().add(xy);
 	}
@@ -306,58 +303,4 @@ public class MainView {
 		progressBar = new ProgressBar();
 	}
 
-	/*
-	public void addFileInput(FileInput fileInput) {
-		FileInputView fileInputView = new FileInputView(fileInput, this);
-		this.vBoxFileInput.getChildren().add(fileInputView.getFileInputView());
-		VBox.setMargin(fileInputView.getFileInputView(), new Insets(0, 0, 30, 0));
-		fileInputView.getFileInputView().getStyleClass().add("file-input");
-		fileInputViews.add(fileInputView);
-		if (availableCrunchers != null) {
-			fileInputView.updateAvailableCrunchers(availableCrunchers);
-		}
-		updateEnableAddFileInput();
-	}
-
-	private void addCruncher() {
-		TextInputDialog dialog = new TextInputDialog("1");
-		dialog.setTitle("Add cruncher");
-		dialog.setHeaderText("Enter cruncher arity");
-
-		Optional<String> result = dialog.showAndWait();
-		result.ifPresent(res -> {
-			try {
-				int arity = Integer.parseInt(res);
-				for (Cruncher cruncher : availableCrunchers) {
-					if (cruncher.getArity() == arity) {
-						Alert alert = new Alert(AlertType.WARNING);
-						alert.setTitle("Error");
-						alert.setHeaderText("Cruncher with this arity already exists.");
-						alert.setContentText(null);
-						alert.showAndWait();
-						return;
-					}
-				}
-				Cruncher cruncher = new Cruncher(arity);
-				CruncherView cruncherView = new CruncherView(this, cruncher);
-				this.vBoxCruncher.getChildren().add(cruncherView.getCruncherView());
-				availableCrunchers.add(cruncher);
-				updateCrunchers(availableCrunchers);
-			} catch (NumberFormatException e) {
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("Wrong input");
-				alert.setHeaderText("Arity must be a number");
-				alert.showAndWait();
-			}
-		});
-	}
-
-		private void getSingleResult() {
-
-	}
-
-	private void sumResults() {
-
-	}
-	*/
 }

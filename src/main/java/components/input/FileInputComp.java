@@ -112,7 +112,7 @@ public class FileInputComp implements Runnable {
         crunchers.add(cruncher);
     }
 
-    void removeCruncher(CounterCruncherComp cruncher) {
+    public void removeCruncher(CounterCruncherComp cruncher) {
         crunchers.remove(cruncher);
     }
 
@@ -120,7 +120,7 @@ public class FileInputComp implements Runnable {
         directories.add(directory);
     }
 
-    void removeDirectory(File directory) {
+    public void removeDirectory(File directory) {
         File[] filesArray = directory.listFiles();
         if (filesArray == null)
             return;

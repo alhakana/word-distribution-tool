@@ -6,8 +6,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Cruncher {
 	public static AtomicInteger NUMBER_OF_CRUNCHERS = new AtomicInteger(0);
 
-	private int arity;
-	private String name;
+	private final int arity;
+	private final String name;
 	
 	public Cruncher(int arity) {
 		this.arity = arity;

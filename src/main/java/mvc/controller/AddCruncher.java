@@ -45,7 +45,7 @@ public class AddCruncher implements EventHandler<ActionEvent> {
                 CruncherView cruncherView = new CruncherView(mainView, cruncher);
                 Text text = new Text("Idle cruncher");
                 cruncherView.setStatus(text);
-                System.out.println("ovde");
+//                System.out.println("ovde");
                 Pools.getInstance().addCruncherComp(arity, text);
 
                 mainView.getVBoxCruncher().getChildren().add(cruncherView.getCruncherView());

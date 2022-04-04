@@ -3,8 +3,6 @@ package mvc.controller;
 import components.Pools;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import mvc.model.FileInput;
 import mvc.view.FileInputView;
@@ -12,7 +10,7 @@ import mvc.view.MainView;
 
 public class AddFileInput implements EventHandler<ActionEvent> {
 
-    private MainView mainView;
+    private final MainView mainView;
 
     public AddFileInput(MainView mainView) {
         this.mainView = mainView;

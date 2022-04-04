@@ -7,7 +7,7 @@ import javafx.scene.control.Button;
 
 public class StartFileInput implements EventHandler<ActionEvent> {
 
-    private String fileInputName;
+    private final String fileInputName;
 
     public  StartFileInput(String fileInputName) {
         this.fileInputName = fileInputName;

@@ -10,8 +10,8 @@ import java.util.concurrent.Future;
 
 public class BagShower implements Runnable {
 
-    private Output output;
-    private CacheOutputComp cacheOutputComp;
+    private final Output output;
+    private final CacheOutputComp cacheOutputComp;
 
     public BagShower(Output output, CacheOutputComp cacheOutputCompMap) {
         this.output = output;
@@ -33,10 +33,10 @@ public class BagShower implements Runnable {
             Utils.removeAndUpdateList(cacheOutputComp.getObservableList(), fileOutput);
 
             System.out.println("BAG SHOWER DONE " + map.size());
-        } catch (InterruptedException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+        } catch (OutOfMemoryError e) {
+            Utils.closeApp();
         }
     }
 }

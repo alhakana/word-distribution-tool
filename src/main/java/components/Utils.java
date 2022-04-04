@@ -2,6 +2,7 @@ package components;
 
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
 import javafx.scene.text.Text;
 import mvc.model.FileOutput;
 
@@ -32,5 +33,10 @@ public class Utils {
             fileOutput.setDone(true);
             observableList.add(fileOutput);
         });
+    }
+
+    public static void closeApp() {
+        new Thread(() -> Pools.getInstance().shutDownPools()).start();
+        Platform.runLater(() -> new Alert(Alert.AlertType.ERROR, "Memory error :(").showAndWait());
     }
 }

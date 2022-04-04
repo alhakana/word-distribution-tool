@@ -1,5 +1,7 @@
 package components.cruncher;
 
+import components.Utils;
+
 import java.util.*;
 import java.util.concurrent.RecursiveTask;
 
@@ -19,7 +21,7 @@ public class FileCruncher extends RecursiveTask<Map<String, Integer>> {
     }
 
     @Override
-    protected Map<String, Integer> compute() {
+    protected Map<String, Integer> compute() throws OutOfMemoryError{
         if (start >= text.length() || start >= end)
             return new HashMap<>();
 
@@ -31,7 +33,7 @@ public class FileCruncher extends RecursiveTask<Map<String, Integer>> {
         return bagOfWords;
     }
 
-    private Map<String, Integer> divideAndFork() {
+    private Map<String, Integer> divideAndFork() throws OutOfMemoryError{
         int length = text.length();
 
         int[] startAndEnd = new int[2];
@@ -44,14 +46,12 @@ public class FileCruncher extends RecursiveTask<Map<String, Integer>> {
 
         forkFileCruncher.fork();
         Map<String, Integer> computeResult = computeFileCruncher.compute();
-//        System.out.println("before join");
         Map<String, Integer> forkResult = forkFileCruncher.join();
 
-//        System.out.println("before merge");
         return mergeBagOfWords(computeResult, forkResult);
     }
 
-    private Map<String, Integer> findBagOfWords(int startIndex, int endIndex) {
+    private Map<String, Integer> findBagOfWords(int startIndex, int endIndex) throws OutOfMemoryError{
 //        System.out.println("FIND BAG OF WORDS");
         Map<String, Integer> bagOfWords = new HashMap<>();
         List<String> words = extractWords(startIndex, endIndex);

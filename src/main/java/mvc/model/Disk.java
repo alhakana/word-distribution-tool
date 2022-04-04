@@ -4,7 +4,7 @@ import java.io.File;
 
 public class Disk {
 	
-	private File directory;
+	private final File directory;
 	
 	public Disk(File directory) {
 		this.directory = directory;

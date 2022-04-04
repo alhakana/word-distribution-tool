@@ -1,6 +1,7 @@
 package components.output;
 
 import components.Output;
+import components.Utils;
 import javafx.collections.ObservableList;
 import mvc.model.FileOutput;
 
@@ -9,10 +10,10 @@ import java.util.concurrent.*;
 
 public class CacheOutputComp implements Runnable{
 
-    private BlockingQueue<Output> outputs;
-    private ExecutorService threadPool;
-    private Map<String, Future<Map<String, Integer>>> result;
-    private ObservableList<FileOutput> observableList;
+    private final BlockingQueue<Output> outputs;
+    private final ExecutorService threadPool;
+    private final Map<String, Future<Map<String, Integer>>> result;
+    private final ObservableList<FileOutput> observableList;
 
     public CacheOutputComp(ExecutorService threadPool, ObservableList<FileOutput> observableList) {
         this.threadPool = threadPool;
@@ -35,14 +36,17 @@ public class CacheOutputComp implements Runnable{
     public void run() {
         while (true) {
             try {
-                Output output = output = outputs.take();
+                Output output = outputs.take();
                 if (output.getName().equals(""))
                     break;
 
                 threadPool.execute(new BagShower(output, this));
             } catch (InterruptedException e) {
                 e.printStackTrace();
+            } catch (OutOfMemoryError e) {
+                Utils.closeApp();
             }
+
         }
     }
 
@@ -62,14 +66,18 @@ public class CacheOutputComp implements Runnable{
         return null;
     }
 
-//     agregacija
-
-
     public Map<String, Future<Map<String, Integer>>> getResult() {
         return result;
     }
 
     public ObservableList<FileOutput> getObservableList() {
         return observableList;
+    }
+
+    public void addResult(String name, Future<Map<String, Integer>> newMap) {
+        FileOutput fileOutput = new FileOutput(name);
+        fileOutput.setDone(true);
+        result.put(name, newMap);
+        Utils.updateList(observableList, fileOutput);
     }
 }

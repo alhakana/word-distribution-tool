@@ -201,6 +201,7 @@ public class FileInputView {
 
 	private void removeDirectory(Directory directory) {
 		directories.getItems().remove(directory);
+		Pools.getInstance().removeDirectory(fileInput.getName(), directory);
 	}
 
 	private void removeDiskInput() {

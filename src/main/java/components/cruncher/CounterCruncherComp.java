@@ -72,9 +72,9 @@ public class CounterCruncherComp implements Runnable{
         caches.add(cacheOutputComp);
     }
 
-    public void removeCache(CacheOutputComp cacheOutputComp) {
-        caches.remove(cacheOutputComp);
-    }
+//    public void removeCache(CacheOutputComp cacheOutputComp) {
+//        caches.remove(cacheOutputComp);
+//    }
 
     public void sendOutput(Output output) {
         caches.iterator().forEachRemaining(cache -> cache.addOutput(output));

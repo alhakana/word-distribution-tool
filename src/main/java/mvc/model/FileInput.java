@@ -6,8 +6,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class FileInput {
 	public static AtomicInteger NUMBER_OF_INPUTS = new AtomicInteger(0);
 
-	private Disk disk;
-	private String name;
+	private final Disk disk;
+	private final String name;
 	
 	public FileInput(Disk disk) {
 		this.disk = disk;

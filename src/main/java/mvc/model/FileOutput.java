@@ -1,7 +1,7 @@
 package mvc.model;
 
 public class FileOutput {
-    private String name;
+    private final String name;
     private boolean done;
 
     public FileOutput(String name) {
@@ -17,9 +17,10 @@ public class FileOutput {
     }
 
     public boolean equals(Object obj) {
-        if (obj != null && obj instanceof FileOutput) {
+        if (obj instanceof FileOutput) {
             return name.equals(((FileOutput) obj).name);
         }
+
         return false;
     }
 
