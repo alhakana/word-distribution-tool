@@ -69,7 +69,7 @@ This component also provides *aggregation* of already calculated results, specif
   
 ## Configuration
 
-The system is configured using the `app.properties` configuration file, which has the following parameters:
+The system is configured using the `config.properties` configuration file, which has the following parameters:
 
 `#blocking time for the FileInput component, given in milliseconds`
 <br />`file_input_sleep_time = 5000`
